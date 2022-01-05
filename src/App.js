@@ -1,60 +1,50 @@
-import React from "react";
-import "./App.css";
-class App extends React.Component {
-  // Constructor
-  constructor(props) {
-    super(props);
+import React, { useState, useEffect } from "react";
 
-    this.state = {
-      items: [],
-      DataisLoaded: false,
-    };
-  }
-
-  // ComponentDidMount is used to
-  // execute the code
-  componentDidMount() {
-    // console.log("hi");
-    // async function fetchData() {
-    //   const response = await fetch("http://localhost:3000/albums", {
-    //     mode: "no-cors",
-    //   });
-    //   // waits until the request completes...
-    //   console.log(response.data);
-    // }
-    // fetchData();
-    fetch("http://localhost:3000/albums", { mode: "no-cors" })
-      .then((res) => {
-        console.log("khkjshskhkhkfhk");
-        res.json();
-        console.log("hi how are you", res.json());
-      })
-      .then((json) => {
-        console.log("iiii");
-        this.setState({
-          items: json,
-          DataisLoaded: true,
-        });
+function App() {
+  const [data, setData] = useState([]);
+  const [song, setSong] = useState(1);
+  function changeLook(event) {
+    var result = [];
+    let albumTitle = event.target.name;
+    console.log(typeof albumTitle);
+    const fetchData = async () => {
+      const res = await fetch(`http://localhost:3000/albums/${albumTitle}`, {
+        method: "GET",
       });
+      const json = await res.json();
+      console.log(json.song);
+      // for (var i in json.song)
+      result.push(json.song);
+      setSong(0);
+      setData(result);
+    };
+    fetchData();
   }
-  render() {
-    const { DataisLoaded, items } = this.state;
-    if (!DataisLoaded)
-      return (
-        <div>
-          <h1> Pleses wait some time.... </h1>{" "}
-        </div>
-      );
 
-    return (
-      <div className="App">
-        <h1> Fetch data from an api in react </h1>{" "}
-        {items.map((item) => (
-          <ol key={item.id}>Title: {item.title}</ol>
-        ))}
-      </div>
-    );
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("http://localhost:3000/albums");
+      const json = await res.json();
+      setData(json);
+    };
+    fetchData();
+  }, [setData]);
+
+  return (
+    <ul>
+      {data.map((item) => (
+        <li key={item._Id}>
+          <h1>{item.title}</h1>
+
+          {song >= 1 && (
+            <button name={item.title} onClick={changeLook} type="submit">
+              Check Songs
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 export default App;
